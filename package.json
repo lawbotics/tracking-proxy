@@ -1,0 +1,13 @@
+{
+  "name": "amplitude-proxy",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "deploy": "gcloud functions deploy amplitude-proxy --runtime nodejs16 --trigger-http --allow-unauthenticated --timeout=60s"
+  },
+  "dependencies": {
+    "express": "^4.17.3",
+    "http-proxy-middleware": "^2.0.4"
+  }
+}
