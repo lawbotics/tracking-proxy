@@ -1,10 +1,11 @@
 {
-  "name": "amplitude-proxy",
+  "name": "tracking-proxy",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "deploy": "gcloud functions deploy amplitude-proxy --entry-point proxy --runtime nodejs16 --trigger-http --allow-unauthenticated --timeout=60s"
+    "deploy:amplitude": "TARGET_URL=https://api.amplitude.com gcloud functions deploy amplitude-proxy --entry-point proxy --runtime nodejs16 --trigger-http --allow-unauthenticated --timeout=60s",
+    "deploy:segment": "TARGET_URL=https://api.segment.io gcloud functions deploy segment-proxy --entry-point proxy --runtime nodejs16 --trigger-http --allow-unauthenticated --timeout=60s"
   },
   "dependencies": {
     "express": "^4.17.3",

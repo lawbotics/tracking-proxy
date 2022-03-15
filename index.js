@@ -4,7 +4,7 @@ const Proxy = require('http-proxy-middleware');
 const app = express();
 
 const proxyInstance = Proxy.createProxyMiddleware({
-  target: 'https://api.amplitude.com',
+  target: process.env.TARGET_URL,
   secure: true,
   changeOrigin: true,
   logLevel: 'error',
