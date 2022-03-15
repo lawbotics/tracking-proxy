@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "deploy": "gcloud functions deploy amplitude-proxy --runtime nodejs16 --trigger-http --allow-unauthenticated --timeout=60s"
+    "deploy": "gcloud functions deploy amplitude-proxy --entry-point proxy --runtime nodejs16 --trigger-http --allow-unauthenticated --timeout=60s"
   },
   "dependencies": {
     "express": "^4.17.3",
