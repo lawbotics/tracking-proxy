@@ -65,7 +65,7 @@ export const requestToEvents = (env: Environment) => async (req: Request, respon
       clientId: body.client as string,
       uploadTime: unknownToTimestamp(body.upload_time),
     };
-
+    console.log(JSON.stringify(req.body.e));
     const rawEvents = JSON.parse(req.body.e);
     const events: TrackerEvent[] = (rawEvents as Array<unknown>)
       .map((rawEvent) => {
