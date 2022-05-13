@@ -15,19 +15,21 @@ interface BaseEvent {
   timestamp?: BigQueryTimestamp;
   sessionId: number;
   userAgent: string;
+  email?: string;
+  companyId?: string;
+  companyName?: string;
+  lawyerId?: string;
 }
 
 interface IdentifyEventProps {
   _type: EventType;
-  email: string;
-  companyId?: string;
-  companyName?: string;
 }
 
 interface BehaviorEventProps {
   _type: EventType;
   product?: string;
   caseId?: string;  
+  caseName?: string;
   eventProperties: string;
 }
 
@@ -68,6 +70,7 @@ export const requestToEvents = (env: Environment) => async (req: Request, respon
     const events: TrackerEvent[] = (rawEvents as Array<unknown>)
       .map((rawEvent) => {
         const rawEventObject = rawEvent as Record<string, unknown>;
+        const eventProps = rawEventObject.event_properties as Record<string, unknown>;
         const baseProps = {
           id: rawEventObject.event_id as number,
           eventType: rawEventObject.event_type as string,
@@ -75,11 +78,14 @@ export const requestToEvents = (env: Environment) => async (req: Request, respon
           timestamp: unknownToTimestamp(rawEventObject.timestamp),
           sessionId: rawEventObject.session_id as number,
           userAgent: rawEventObject.user_agent as string,
+          companyId: cast<string>(eventProps.companyId),
+          companyName: cast<string>(eventProps.companyName),
+          email: cast<string>(eventProps.email),
+          lawyerId: cast<string>(eventProps.lawyerId),
         };
         const trackerEventProps = resolveTrackerEventProps(rawEventObject);
         return {...envelopeProps, ...baseProps, ...trackerEventProps};
       });
-    console.log(JSON.stringify(events, null, 2));
     await insertRows(events, env);
   }
   next();
@@ -92,9 +98,6 @@ const resolveTrackerEventProps = (body: Record<string, unknown>): TrackerEventPr
     const sets = user_props.$set as Record<string, any>;
     return {
       _type: "identify",
-      email: sets.email as string,
-      companyId: cast<string>(sets.company?.id),
-      companyName: cast<string>(sets.company?.name),
     };
   }
   const event_props = body.event_properties as Record<string, unknown>;
@@ -102,6 +105,7 @@ const resolveTrackerEventProps = (body: Record<string, unknown>): TrackerEventPr
     _type: "behavior",
     product: cast<string>(event_props.product),
     caseId: cast<string>(event_props.caseId),
+    caseName: cast<string>(event_props.caseName),
     eventProperties: JSON.stringify(event_props),
   }
 

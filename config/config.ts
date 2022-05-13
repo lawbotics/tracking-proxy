@@ -28,20 +28,22 @@ const commonSchema: SchemaColumn[] = [
   { name: 'userAgent', type: 'STRING' },
   { name: 'clientId', type: 'STRING' },
   { name: 'uploadTime', type: 'TIMESTAMP' },
+  { name: 'companyId', type: 'STRING'},
+  { name: 'companyName', type: 'STRING'},
+  { name: 'email', type: 'STRING'},
+  { name: 'lawyerId', type: 'STRING'},
 ];
 
 const behaviorSchema: SchemaColumn[] = [
   ...commonSchema,
   { name: 'product', type: 'STRING'},
   { name: 'caseId', type: 'STRING'},
+  { name: 'caseName', type: 'STRING'},
   { name: 'eventProperties', type: 'STRING'},
 ];
 
 const identifySchema: SchemaColumn[] = [
   ...commonSchema,
-  { name: 'email', type: 'STRING'},
-  { name: 'companyId', type: 'STRING'},
-  { name: 'companyName', type: 'STRING'},
 ];
 
 const tables: Table[] = [

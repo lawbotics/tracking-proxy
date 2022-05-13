@@ -26,7 +26,6 @@ export const insertRows = async (events: TrackerEvent[], env: Environment) => {
           .insert(eventsToInsert);
       } catch (e) {
         console.warn(`Failed to insert ${eventsToInsert.length} into table ${table.id}`, e);
-        console.log(JSON.stringify(eventsToInsert, null, 2));
       }
     } 
   }
