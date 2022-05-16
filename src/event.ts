@@ -4,7 +4,7 @@ import { Environment, EventType } from './config';
 import { insertRows } from './writer';
 
 interface Envelope {
-  clientId: string;
+  clientId?: string;
   uploadTime?: BigQueryTimestamp;
 }
 
@@ -13,8 +13,8 @@ interface BaseEvent {
   eventType: string;
   userId: string;
   timestamp?: BigQueryTimestamp;
-  sessionId: number;
-  userAgent: string;
+  sessionId?: number;
+  userAgent?: string;
   email?: string;
   companyId?: string;
   companyName?: string;
@@ -55,29 +55,33 @@ function unknownToTimestamp(num: unknown): BigQueryTimestamp | undefined {
   if (validNum) {
     return numToTimestamp(validNum);
   }
-  return undefined;
+  return new BigQueryTimestamp(new Date());
 }
 
 export const requestToEvents = (env: Environment) => async (req: Request, response: Response, next: NextFunction) => {
   if (req.method === 'POST') {
     const body = req.body;
     const envelopeProps: Envelope = {
-      clientId: body.client as string,
+      // backend events send API key instead of client ID (but they are the same)
+      clientId: (body.client || body.api_key) as string,
       uploadTime: unknownToTimestamp(body.upload_time),
     };
-    console.log(JSON.stringify(req.body.e));
-    const rawEvents = JSON.parse(req.body.e);
+
+    // backend events send the events in the 'events' field but it's sent in the 'e' field for frontend events
+    const jsonString = JSON.stringify(req.body.e || req.body.events);
+    console.log(jsonString);
+    const rawEvents = JSON.parse(jsonString);
     const events: TrackerEvent[] = (rawEvents as Array<unknown>)
       .map((rawEvent) => {
         const rawEventObject = rawEvent as Record<string, unknown>;
         const eventProps = rawEventObject.event_properties as Record<string, unknown>;
         const baseProps = {
-          id: rawEventObject.event_id as number,
+          id: rawEventObject.event_id as number || new Date().valueOf(),
           eventType: rawEventObject.event_type as string,
           userId: rawEventObject.user_id as string,
           timestamp: unknownToTimestamp(rawEventObject.timestamp),
-          sessionId: rawEventObject.session_id as number,
-          userAgent: rawEventObject.user_agent as string,
+          sessionId: cast<number>(rawEventObject.session_id),
+          userAgent: cast<string>(rawEventObject.user_agent),
           companyId: cast<string>(eventProps.companyId),
           companyName: cast<string>(eventProps.companyName),
           email: cast<string>(eventProps.email),
@@ -108,6 +112,10 @@ const resolveTrackerEventProps = (body: Record<string, unknown>): TrackerEventPr
     caseName: cast<string>(event_props.caseName),
     eventProperties: JSON.stringify(event_props),
   }
-
 };
+
+
+const randomInt = (min = Number.MIN_VALUE, max = Number.MAX_VALUE) => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
