@@ -68,9 +68,7 @@ export const requestToEvents = (env: Environment) => async (req: Request, respon
     };
 
     // backend events send the events in the 'events' field but it's sent in the 'e' field for frontend events
-    const jsonString = JSON.stringify(req.body.e || req.body.events);
-    console.log(jsonString);
-    const rawEvents = JSON.parse(jsonString);
+    const rawEvents = req.body.events || JSON.parse(req.body.e);
     const events: TrackerEvent[] = (rawEvents as Array<unknown>)
       .map((rawEvent) => {
         const rawEventObject = rawEvent as Record<string, unknown>;

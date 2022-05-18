@@ -5,8 +5,6 @@ import { dataset, Environment } from "../config/config";
 type TrackerEventDao = Omit<TrackerEvent, "_type">;
 
 export const insertRows = async (events: TrackerEvent[], env: Environment) => {
-  console.log("TO insert");
-  console.log(JSON.stringify(events, null, 2));
   const bigQuery = new BigQuery();
   const daoEvents = events
     .reduce<Record<string, TrackerEventDao[]>>((acc, curr) => {
@@ -16,7 +14,6 @@ export const insertRows = async (events: TrackerEvent[], env: Environment) => {
       acc[curr._type] = [...prevEvents, daoEvent];
       return acc;
     }, {});
-
   for (const table of dataset.tables.filter((tb) => tb.environment === env)) {
     const eventsToInsert = daoEvents[table.eventType] || [];
     if (eventsToInsert.length > 0) {
@@ -28,6 +25,6 @@ export const insertRows = async (events: TrackerEvent[], env: Environment) => {
       } catch (e) {
         console.warn(`Failed to insert ${eventsToInsert.length} into table ${table.id}`, JSON.stringify(e, null, 2));
       }
-    } 
+    }
   }
 }
