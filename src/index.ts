@@ -21,6 +21,9 @@ const proxyInstance = createProxyMiddleware({
   secure: true,
   changeOrigin: true,
   logLevel: "error",
+  onError: (err, req, res) => {
+    console.error(`Error occured in proxy middleware`, err);
+  },
   onProxyReq: (proxyReq, req) => {
     fixRequestBody(proxyReq, req as http.IncomingMessage);
   }
